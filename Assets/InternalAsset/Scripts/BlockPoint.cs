@@ -6,7 +6,7 @@ public class BlockPoint : MonoBehaviour
 {
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.collider.tag == "Player")
+        if(collision.collider.tag == "Ball")
         {
             collision.gameObject.GetComponent<PlayerController>().AddPoint = 1;
             SpawnController.Instance.Spawn(this.gameObject);

@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class SpawnController : MonoBehaviour
+public class SpawnController : NetworkBehaviour
 {
     #region Singleton
     public static SpawnController _instance;
@@ -21,13 +22,23 @@ public class SpawnController : MonoBehaviour
     public int CountOnScene;
     public List<GameObject> ObjectPool = new List<GameObject>();
     
+    /*Зона спавна*/
     [SerializeField]private Transform ZoneSpawn;
+
+    /*Позиции для спавна*/
+    [SyncVar] private float posX;
+    [SyncVar] private float posZ;
 
     private void Awake()
     {
         /*Singleton*/
         _instance = this;
+    }
 
+    [ServerCallback]
+    /*Спавн объектов в самом начале игры*/
+    public void StartGameSpawn()
+    {
         #region Спавн объектов в начале игры
         if (CountPool < CountOnScene)
         {
@@ -36,20 +47,22 @@ public class SpawnController : MonoBehaviour
         else
         {
             SpawnInPool();
-
-            for (int i = 0; i < CountOnScene; i++)
-            {
-                Spawn(null);
-            }
         }
         #endregion
+
+        for (int i = 0; i < CountOnScene; i++)
+        {
+            Spawn(null);
+        }
     }
 
+    [ServerCallback]
+    /*Спавн объектов*/
     public void Spawn(GameObject obj)
     {
         /*Генерация позиции для спавна*/
-        float posX = Random.Range(-(int)ZoneSpawn.localScale.x, (int)ZoneSpawn.localScale.z) / 2;
-        float posZ = Random.Range(-(int)ZoneSpawn.localScale.x, (int)ZoneSpawn.localScale.z) / 2;
+        posX = Random.Range(-(int)ZoneSpawn.localScale.x, (int)ZoneSpawn.localScale.z) / 2;
+        posZ = Random.Range(-(int)ZoneSpawn.localScale.x, (int)ZoneSpawn.localScale.z) / 2;
 
         /*Чтобы не возникло путаницы с кол-вом объектом, решено в зависимости от ситуации выбирать способ спавна.
          Если использовать просто SpawnObjFromPool, при условии CountPool == CountOnScene, то объект не успеет исчезнуть и в пуле он не найдётся*/
@@ -66,20 +79,23 @@ public class SpawnController : MonoBehaviour
     /// <summary>
     /// Спавн в пул объектов
     /// </summary>
+    [Server]
     void SpawnInPool()
     {
         for (int i = 0; i < CountPool; i++)
         {
             var poolObj = Instantiate(Prefab);
             ObjectPool.Add(poolObj);
+            NetworkServer.Spawn(poolObj);
             poolObj.SetActive(false);
         }
     }
 
     /// <summary>
-    /// Спавн объекта
+    /// Спавн свободного объекта из пула
     /// </summary>
     /// <param name="go"></param>
+    [Server]
     void SpawnObjFromPool(float posX, float posZ)
     {
         GameObject go = new GameObject(); //Объект для спавна
@@ -96,6 +112,8 @@ public class SpawnController : MonoBehaviour
         go.SetActive(true);
     }
 
+    /*Спавн конкретного объекта*/
+    [Server]
     void SpawnObj(float posX, float posZ, GameObject go)
     {
         go.transform.position = new Vector3(posX, 20, posZ);

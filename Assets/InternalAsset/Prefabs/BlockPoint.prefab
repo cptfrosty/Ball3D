@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7813473376106832926}
   - component: {fileID: 7813473376106832914}
   - component: {fileID: 7813473376106832913}
+  - component: {fileID: -7249278960322460172}
   m_Layer: 0
   m_Name: BlockPoint
   m_TagString: Untagged
@@ -125,3 +126,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f3036987a4381241b2b8fa7790d31ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-7249278960322460172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7813473376106832927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 
+  hasSpawned: 0

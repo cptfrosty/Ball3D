@@ -1,24 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
+    //Имя игрока для отображения в таблице
+    public string NamePlayer;
     //Скорость передвижения
-    public float Speed;             
+    [SyncVar]public float Speed;             
 
     //Физ. компонент
     private Rigidbody _rb;          
     //Кол-во очков
-    private int _countPoint = 0;    
+    [SyncVar]private int _countPoint = 0;    
     //Вектор передвижения
-    private Vector3 movementVector = new Vector3(); 
+    private Vector3 movementVector = new Vector3();
+
+
+    public override void OnStopClient()
+    {
+        SceneController.Instance.RemovePlayer(this);
+        base.OnStopClient();
+    }
 
     void Start()
     {
-        _rb = GetComponent<Rigidbody>();
-        /*Установить слежение за игроком через камеру*/
-        CameraController.Instance.SetTarget = this.transform;
+        if (isLocalPlayer)
+        {
+            _rb = GetComponent<Rigidbody>();
+            /*Установить слежение за игроком через камеру*/
+            CameraController.Instance.SetTarget = this.transform;
+            /*Заспавнить объекты на карте*/
+            SpawnController.Instance.StartGameSpawn();
+        }
+
+        if (isClient)
+        {
+            /*Добавить игрока в список на сервер*/
+            SceneController.Instance.AddPlayer(this);
+        }
     }
 
     void Update()
@@ -26,18 +47,34 @@ public class PlayerController : MonoBehaviour
         Move();
     }
 
+
     /*Добавить очков*/
     public int AddPoint
     {
         set
         {
             _countPoint += value;
-            HUDController.Instance.UpdatePoint(_countPoint);
+            HUDController.Instance.UpdatePoint(this.connectionToClient,_countPoint);
+            HUDController.Instance.UpdateListPlayer();
         }
     }
 
+    /// <summary>
+    /// Получить кол-во очков
+    /// </summary>
+    public int GetPoint
+    {
+        get
+        {
+            return _countPoint;
+        }
+    }
+
+    [Client]
     void Move()
     {
+        if (!isLocalPlayer) return;
+
         movementVector.x = Input.GetAxis("Horizontal");
         movementVector.z = Input.GetAxis("Vertical");
 

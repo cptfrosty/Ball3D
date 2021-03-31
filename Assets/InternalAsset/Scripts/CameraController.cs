@@ -42,11 +42,13 @@ public class CameraController : MonoBehaviour
         limit = Mathf.Abs(limit);
         if (limit > 90) limit = 90;
         offset = new Vector3(offset.x, offset.y, -Mathf.Abs(zoomMax) / 2);
-        transform.position = _target.position + offset;
+        //transform.position = _target.position + offset;
     }
 
     private void Update()
     {
+        if (_target == null) return;
+
         if (Input.GetAxis("Mouse ScrollWheel") > 0) offset.z += zoom;
         else if (Input.GetAxis("Mouse ScrollWheel") < 0) offset.z -= zoom;
         offset.z = Mathf.Clamp(offset.z, -Mathf.Abs(zoomMax), -Mathf.Abs(zoomMin));
