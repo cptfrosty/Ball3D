@@ -10,7 +10,7 @@ namespace Ball3DGame
         #region Переменные
 
         //Имя игрока для отображения в таблице
-        public string NamePlayer;
+        [SyncVar] [SerializeField] public string NamePlayer;
         //Скорость передвижения
         [SyncVar] public float Speed;
 
@@ -22,25 +22,32 @@ namespace Ball3DGame
         private Vector3 movementVector = new Vector3();
         #endregion
 
-        /*public override void OnStopClient()
+        public override void OnStopClient()
         {
-            SceneController.Instance.RemovePlayer(this);
+            SceneController.Instance.CmdRemovePlayer(this.netId);
+            if (isLocalPlayer)
+            {
+                LogInController.Instance.ShowPanel();
+                HUDController.Instance.HideHUD();
+            }
             base.OnStopClient();
-        }*/
+        }
 
         /*Срабатывает при подключении клиента*/
         public override void OnStartClient()
         {
             base.OnStartClient();
-
-            /*Добавить игрока в список на сервер*/
+            
             if (isLocalPlayer)
             {
-                CmdAddPlayerList();
                 _rb = GetComponent<Rigidbody>();
                 /*Установить слежение за игроком через камеру*/
                 CameraController.Instance.SetTarget = this.transform;
 
+                /*Добавить игрока в список на сервер*/
+                CmdAddPlayerList(this, LogInController.Instance.namePlayer);
+                LogInController.Instance.HidePanel();
+                HUDController.Instance.ShowHUD();
             }
         }
 
@@ -48,14 +55,20 @@ namespace Ball3DGame
         /// Добавить игрока в лист
         /// </summary>
         [Command (requiresAuthority = false)]
-        public void CmdAddPlayerList()
+        public void CmdAddPlayerList(PlayerController player, string namePlayer)
         {
-            SceneController.Instance.AddPlayer(this);
+            player.NamePlayer = namePlayer;
+            SceneController.Instance.AddPlayer(player);
         }
 
         void Update()
         {
             Move();
+
+            if (isServer)
+            {
+                Speed = 10;
+            }
         }
 
 

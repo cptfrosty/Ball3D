@@ -5,7 +5,6 @@ using Mirror;
 
 namespace Ball3DGame
 {
-
     public class HUDController : NetworkBehaviour
     {
         #region Singleton
@@ -17,6 +16,7 @@ namespace Ball3DGame
         }
         #endregion
 
+        public GameObject MainHUD; //Родитель двух нижних объектов
         public UnityEngine.UI.Text TextPoint;
         public UnityEngine.UI.Text StatsPlayers;
 
@@ -24,6 +24,8 @@ namespace Ball3DGame
         {
             /*Singleton*/
             _instance = this;
+
+            HideHUD(); //Скрыть отображение HUD
         }
 
         /// <summary>
@@ -62,6 +64,16 @@ namespace Ball3DGame
         public void UpdateListClients(string listClients)
         {
             StatsPlayers.text = listClients;
+        }
+
+        public void ShowHUD()
+        {
+            MainHUD.SetActive(true);
+        }
+
+        public void HideHUD()
+        {
+            MainHUD.SetActive(false);
         }
     }
 }

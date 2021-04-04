@@ -40,15 +40,17 @@ namespace Ball3DGame
         /// ”далить игрока
         /// </summary>
         /// <param name="player">—сылка на игрока</param>
-        public void RemovePlayer(PlayerController player)
+        public void CmdRemovePlayer(uint netId)
         {
             for (int i = 0; i < Players.Count; i++)
             {
-                if (Players[i].netId == player.netId)
+                if (Players[i].netId == netId)
                 {
                     Players.RemoveAt(i);
                 }
             }
+
+            HUDController.Instance.UpdateListPlayers(); //ќбновить лист игроков
         }
     }
 }
