@@ -1,17 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class BlockPoint : MonoBehaviour
+namespace Ball3DGame
 {
-    private void OnCollisionEnter(Collision collision)
+    public class BlockPoint : NetworkBehaviour
     {
-        if(collision.collider.tag == "Ball")
-        {
-            collision.gameObject.GetComponent<PlayerController>().AddPoint = 1;
-            SpawnController.Instance.Spawn(this.gameObject);
+        /* Скрипт игрового объекта, который поднимает игрок и получает за это очки. 
+         * Взаимодействие происходит засчет столкновение двух объектов со скриптами 
+         * PlayerController (ещё должен быть тэг Ball) и BlockPoint*/
 
-            this.gameObject.SetActive(false);
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision.collider.tag == "Ball")
+            {
+                collision.gameObject.GetComponent<PlayerController>().TakePoint(collision.gameObject.GetComponent<PlayerController>(),1);
+                NetworkServer.Destroy(this.gameObject);
+            }
         }
     }
 }

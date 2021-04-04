@@ -3,49 +3,65 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class HUDController : NetworkBehaviour
+namespace Ball3DGame
 {
-    #region Singleton
-    public static HUDController _instance;
 
-    public static HUDController Instance
+    public class HUDController : NetworkBehaviour
     {
-        get { return _instance; }
-    }
-    #endregion
+        #region Singleton
+        public static HUDController _instance;
 
-    public UnityEngine.UI.Text TextPoint;
-    public UnityEngine.UI.Text StatsPlayers;
-
-    private void Awake()
-    {
-        /*Singleton*/
-        _instance = this;
-    }
-
-    /// <summary>
-    /// Обновить очки игрока
-    /// </summary>
-    /// <param name="point">Кол-во очков</param>
-    [TargetRpc]
-    public void UpdatePoint(NetworkConnection target, int point)
-    {
-        if (isLocalPlayer) return;
-        TextPoint.text = "Очки: " + point;
-    }
-
-    public void UpdateListPlayer()
-    {
-        UpdateListPlayers(SceneController.Instance.Players);
-    }
-
-    public void UpdateListPlayers(List<PlayerController> players)
-    {
-        StatsPlayers.text = "";
-        StatsPlayers.text = "ИГРОКИ: \n";
-        for(int i = 0; i < players.Count; i++)
+        public static HUDController Instance
         {
-            StatsPlayers.text += $"{i + 1}. {players[i].NamePlayer} - {players[i].GetPoint} очков\n";
+            get { return _instance; }
+        }
+        #endregion
+
+        public UnityEngine.UI.Text TextPoint;
+        public UnityEngine.UI.Text StatsPlayers;
+
+        private void Awake()
+        {
+            /*Singleton*/
+            _instance = this;
+        }
+
+        /// <summary>
+        /// Обновить очки игрока
+        /// </summary>
+        /// <param name="point">Кол-во очков</param>
+        [TargetRpc]
+        public void TargetUpdatePoint(NetworkConnection target,int point)
+        {
+            TextPoint.text = "Очки: " + point;
+        }
+
+        [Server]
+        public void UpdateListPlayers()
+        {
+            /*Ссылка на игроков, для того, чтобы удобней было читать код*/
+            ref List<PlayerController> players = ref SceneController.Instance.Players;
+
+            /*Формирует список пользователей и кол-во их набранных очков*/
+            string newListPlayers;
+            newListPlayers = "";
+            newListPlayers = "ИГРОКИ: \n";
+            for (int i = 0; i < players.Count; i++)
+            {
+                newListPlayers += $"{i + 1}. {players[i].NamePlayer} - {players[i].GetPoint} очков\n";
+            }
+
+            /*Отправляет клиентам сформированный список*/
+            UpdateListClients(newListPlayers);
+        }
+
+        /// <summary>
+        /// Обновить список пользователей у клиентов
+        /// </summary>
+        [ClientRpc]
+        public void UpdateListClients(string listClients)
+        {
+            StatsPlayers.text = listClients;
         }
     }
 }

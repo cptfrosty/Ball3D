@@ -3,47 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class SceneController : MonoBehaviour
+namespace Ball3DGame
 {
-    #region Singleton
-    public static SceneController _instance;
 
-    public static SceneController Instance
+    public class SceneController : NetworkBehaviour
     {
-        get { return _instance; }
-    }
-    #endregion
-    private void Awake()
-    {
-        /*Singleton*/
-        _instance = this;
-    }
-   
-    public List<PlayerController> Players = new List<PlayerController>();
+        #region Singleton
+        public static SceneController _instance;
 
-    [Client]
-    /// <summary>
-    /// Добавить игрока
-    /// </summary>
-    /// <param name="player">Ссылка на игрока</param>
-    public void AddPlayer(PlayerController player)
-    {
-        Players.Add(player);
-        HUDController.Instance.UpdateListPlayer(); //Обновить лист игроков
-    }
-
-    [Server]
-    /// <summary>
-    /// Удалить игрока
-    /// </summary>
-    /// <param name="player">Ссылка на игрока</param>
-    public void RemovePlayer(PlayerController player)
-    {
-        for(int i = 0; i < Players.Count; i++)
+        public static SceneController Instance
         {
-            if(Players[i].netId == player.netId)
+            get { return _instance; }
+        }
+        #endregion
+        private void Awake()
+        {
+            /*Singleton*/
+            _instance = this;
+        }
+
+        public List<PlayerController> Players = new List<PlayerController>();
+
+        [Server]
+        /// <summary>
+        /// Добавить игрока
+        /// </summary>
+        /// <param name="player">Ссылка на игрока</param>
+        public void AddPlayer(PlayerController player)
+        {
+            Players.Add(player);
+            HUDController.Instance.UpdateListPlayers(); //Обновить лист игроков
+        }
+
+        [Server]
+        /// <summary>
+        /// Удалить игрока
+        /// </summary>
+        /// <param name="player">Ссылка на игрока</param>
+        public void RemovePlayer(PlayerController player)
+        {
+            for (int i = 0; i < Players.Count; i++)
             {
-                Players.RemoveAt(i);
+                if (Players[i].netId == player.netId)
+                {
+                    Players.RemoveAt(i);
+                }
             }
         }
     }
