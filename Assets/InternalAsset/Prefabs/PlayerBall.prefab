@@ -129,8 +129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  NamePlayer: l;kgdsfj
-  Speed: 6
+  NamePlayer: Player
+  Speed: 1100
 --- !u!114 &2013222255666965340
 MonoBehaviour:
   m_ObjectHideFlags: 0

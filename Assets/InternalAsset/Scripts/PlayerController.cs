@@ -64,11 +64,6 @@ namespace Ball3DGame
         void Update()
         {
             Move();
-
-            if (isServer)
-            {
-                Speed = 10;
-            }
         }
 
 
@@ -119,7 +114,7 @@ namespace Ball3DGame
             if (movementVector.z > 0 || movementVector.z < 0)
                 moveXZ = new Vector3(camera.forward.x * movementVector.z, camera.forward.y, camera.forward.z * movementVector.z);
 
-            _rb.AddForce(moveXZ * Speed);
+            _rb.AddForce((moveXZ * Speed) * Time.deltaTime);
         }
     }
 }
